@@ -1,0 +1,101 @@
+SIMULATE 1
+
+! Грузовики
+truck CAPACITY 1
+! Склад
+sclad CAPACITY 10000
+! Магазин
+shop CAPACITY 5
+
+!Скоропортящиеся
+	GENERATE 1, 0.5,,,1
+		LET p$tm = c1
+		! занимаем склад
+		ENTER sclad
+			! ждем пока магазин занят
+			WAITIF shop=F
+			! ждем пока грузовик занят
+			WAITIF truck=F, 1
+		LEAVE sclad
+
+		! если время транзакта истекло то uxod (не везем)
+		IF c1-p$tm>3, uxod
+		
+		! занимаем грузовик
+		ENTER truck
+			! загрузка -> перевозка -> разгрузка
+			ADVANCE FN$XPDIS(1)
+			LET+ x$perz, 1
+		LEAVE truck
+
+		! если время транзакта истекло то uxod (не продаем)
+		IF c1-p$tm>3, uxod
+		
+		! занимаем магазин
+		ENTER shop	
+			! продажа
+			ADVANCE 1.5,1
+			! получаем прибыль
+			LET+ x$sum1, 1
+		LEAVE shop
+		goto end1
+
+
+		! получаем убыток
+		uxod LET- x$sum1, 1
+
+	end1 TERMINATE
+
+
+
+
+	!Долго хранимые
+	GENERATE 2, 1
+
+		LET p$tm = c1
+		! занимаем склад
+		ENTER sclad
+			! ждем пока магазин занят
+			WAITIF shop=F
+			! ждем пока грузовик занят
+			WAITIF truck=F, 1
+		LEAVE sclad
+
+		! если время транзакта истекло то uxod (не везем)
+		IF c1-p$tm>10, uxod2
+		
+		! занимаем грузовик
+		ENTER truck
+			! загрузка -> перевозка -> разгрузка
+			ADVANCE FN$XPDIS(1)
+			LET+ x$perz, 1
+		LEAVE truck
+
+		! если время транзакта истекло то uxod (не продаем)
+		IF c1-p$tm>10, uxod2
+		
+		! занимаем магазин
+		ENTER shop	
+			! продажа
+			ADVANCE 1.5,0.5
+			! получаем прибыль
+			LET+ x$sum2, 1
+		LEAVE shop
+		goto end2
+
+
+		! получаем убыток
+		uxod2 LET- x$sum2, 1
+
+	end2 TERMINATE
+
+
+
+
+!Таймер на 100 дней
+	GENERATE 100
+		LET x$dengi= x$sum1*1000+x$sum2*3000-x$perz*500
+	TERMINATE 1
+
+START 1
+END

@@ -1,0 +1,23 @@
+SIMULATE 1
+
+OBS FUNCTION rn1,D
+0.5 8
+1 14
+worker CAPACITY 1
+QTABLE stopi,0,1,1,G
+	
+	GENERATE 20,19
+		LET p$time=c1
+		ARRIVE stopi
+		ENTER worker
+		LET+ x$total, c1-p$time
+		DEPART stopi
+		ADVANCE FN$OBS
+		LEAVE worker
+	TERMINATE 
+
+	GENERATE 4*60
+	TERMINATE 1
+
+START 1
+END

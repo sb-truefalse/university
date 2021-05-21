@@ -1,0 +1,52 @@
+SIMULATE 1
+
+! Грузовики
+truck CAPACITY 1
+! Вместимость
+shop CAPACITY 5
+
+!Поступление скоропортящихся
+	GENERATE 1, 0.5,,,1
+		LET+ x$sclad1, 1
+		IF q$shop<5, uxod
+		ENTER truck
+			ADVANCE FN$XPDIS(1)
+			LET+ x$count, 1
+		LEAVE truck
+	uhod TERMINATE
+
+!Поступление долго хранимых
+	GENERATE 2, 1
+		LET+ x$sclad2, 1
+		IF q$shop<5, uxod
+		ENTER truck
+			ADVANCE FN$XPDIS(1)
+			LET+ x$count, 1
+		LEAVE truck
+	TERMINATE
+
+
+!Продажа скоропортящихся
+	GENERATE 1.5,1
+		IF q$shop=0, uxod2
+		ENTER shop
+		LET+ x$prod1, 1
+		LEAVE shop
+	uxod2 TERMINATE
+
+!Продажа долго хранимых
+	GENERATE 1.5,0.5
+		IF q$shop=0, uxod1
+		add LET+ x$prod2, 1
+	uxod1 TERMINATE
+
+
+!Таймер на 100 дней
+	GENERATE 100
+		LET x$expens=x$count*500+x$umer1*1000+x$umer1*3000
+		LET x$income=x$sclad1*1000+x$sclad2*3000
+		LET x$profit=x$income-x$expens
+	TERMINATE 1
+
+START 1
+END

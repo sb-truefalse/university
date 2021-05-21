@@ -1,0 +1,62 @@
+KANFN function rn1, D
+	0.6 buxGot
+	1	kadGot
+
+BUXFN function rn1, D
+	0.8 arhive
+	1	dioGot
+	
+KADFN function rn1, D
+	0.9 arhive
+	1	ditGot
+
+! Переменные
+kanVar CAPACITY 1
+buxVar CAPACITY 1
+kadVar CAPACITY 1
+dirVar CAPACITY 1
+
+
+SIMULATE 1
+
+! Поступление заявки по различным каналам
+	GENERATE FN$XPDIS*25
+		
+	! Поступление заявки в канцелярию
+	ENTER kanVar
+		ADVANCE FN$XPDIS*10
+	LEAVE kanVar
+	GOTO FN$KANFN
+
+	! Поступление заявки в бухгалтерию
+	buxGot ENTER buxVar
+		ADVANCE FN$XPDIS*50
+	LEAVE buxVar
+	GOTO FN$BUXFN
+
+	! Поступление заявки в кадровы отдел
+	kadGot ENTER kadVar
+		ADVANCE FN$XPDIS*40
+	LEAVE kadVar
+	GOTO FN$KADFN
+
+	! Поступление заявки директору от бухгалтерии
+	dioGot ENTER dirVar
+		ADVANCE FN$XPDIS*2
+	LEAVE dirVar
+	GOTO buxGot
+
+	! Поступление заявки директору от кадрового отдела
+	ditGot ENTER dirVar
+		ADVANCE FN$XPDIS*2
+	LEAVE dirVar
+	GOTO kadGot
+
+arhive TERMINATE
+
+! Таймер на 8*5*4*12*60 минут (8-часовой рабочий день 5 раз в неделю в течение 1 года)
+	GENERATE 126720
+	TERMINATE 1
+
+START 1
+END

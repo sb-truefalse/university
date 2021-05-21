@@ -1,0 +1,51 @@
+SIMULATE 1
+
+! Грузовики
+truck CAPACITY 1
+
+! Места в магазине
+LET x$place1 = 0
+LET x$place2 = 0
+
+!Поступление скоропортящихся
+	GENERATE 1, 0.5,,,1
+		LET+ x$prod1, 1
+		ENTER truck
+			ADVANCE FN$XPDIS(1)
+	wait1	IF x$place1+x$place2=5, wait1
+			LET+ x$place1, 1
+		LEAVE truck
+	TERMINATE
+
+!Поступление долго хранимых
+	GENERATE 2, 1
+		LET+ x$prod2, 1
+		ENTER truck
+			ADVANCE FN$XPDIS(1)
+	wait2	IF x$place1+x$place2=5, wait2
+			LET+ x$place2, 1
+		LEAVE truck
+	TERMINATE
+
+
+!Продажа скоропортящихся
+	GENERATE 1.5,1
+!		WAITIF x$place1=0
+		LET- x$place1, 1
+		LET+ x$sale1, 1
+	uxod1 TERMINATE
+
+!Продажа долго хранимых
+	GENERATE 1.5,0.5
+!		WAITIF x$place2=0
+		LET- x$place2, 1
+		LET+ x$sale2, 1
+	uxod2 TERMINATE
+
+
+!Таймер на 100 дней
+	GENERATE 100
+	TERMINATE 1
+
+START 1
+END

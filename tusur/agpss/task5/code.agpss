@@ -1,0 +1,61 @@
+POLFN function rn1, D
+	0.5 obrGot
+	1	sbtGot
+
+!Обработка
+  obrVar CAPACITY 1
+!Сборка
+  sboVar CAPACITY 1
+  sbtVar CAPACITY 1
+!Регулировка
+  regul CAPACITY 1
+
+
+SIMULATE 1
+
+! Поступление деталей
+GENERATE FN$XPDIS*10
+	
+	! распоковка партии (3 детали) и отправление на распредление
+	SPLIT 2, gogo
+	! 50% деталей отправляем на обработку
+	gogo GOTO FN$POLFN
+	
+	! Поступление деталей на обработку
+	obrGot ENTER obrVar
+		ADVANCE FN$XPDIS*7
+	LEAVE obrVar
+	
+	! Обработка
+	ENTER sboVar
+		WAITIF x$jduNo=0
+		brak ADVANCE FN$XPDIS*6
+		GOTO brak, 0.04
+		LET x$jduOk=1
+	LEAVE sboVar
+	GOTO regGot
+
+	! Поступление не обработанных деталей на сборку	 
+	sbtGot ENTER sbtVar
+		LET x$jduNo=1
+		WAITIF x$jduOk=0
+		LET x$jduNo=0
+		LET x$jduOk=0
+	LEAVE sbtVar
+	GOTO kill
+
+	!регулировка
+	 regGot ENTER regul
+	 	ADVANCE FN$XPDIS*8
+	 	LET+ x$izdel1, 1
+	 LEAVE regul
+
+kill TERMINATE
+
+! Таймер
+	GENERATE 24*60
+		LET x$izdel1=x$izdel1
+	TERMINATE 1
+
+START 1
+END
